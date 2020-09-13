@@ -134,21 +134,6 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-    @app.route("/categories", methods=['GET'])
-    def get_categories():
-        # get all categories
-        categories = Category.query.order_by(Category.type).all()
-        formatted_categories = {category.id: category.type for category in categories}
-        
-        if len(categories) == 0:
-            abort(404)
-
-        return jsonify({
-            'success': True,
-            'categories': formatted_categories,
-            'total_categories': len(categories)
-        })
-
     @app.route("/categories/<category_id>/questions", methods=['GET'])
     def get_questions_by_category(category_id):
         # get questions by category
@@ -171,28 +156,28 @@ def create_app(test_config=None):
             'current_category': category_id
         })
 
-    '''
-    @TODO: 
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not. 
-    '''
     @app.route("/quizzes", methods=['POST'])
-    def create_question():
-        # create a new question
+    def play_quiz():
+        # play the quiz game
         body = request.get_json()
         try:
             previous_questions = body.get('previous_questions')
             quiz_category = body.get('quiz_category')
 
-            questions = Question.query.filter(
-              Question.category == quiz_category['id'],
-              Question.id.notin_(previous_questions)
-            ).all()
+
+            if quiz_category['id'] == 0:
+                questions = Question.query.filter(
+                    Question.id.notin_(previous_questions)
+                ).all()
+            else:
+                questions = Question.query.filter(
+                    Question.id.notin_(previous_questions),
+                    Question.category == quiz_category['id']
+                ).all()
 
             if len(questions) > 0:
                 question = questions[random.randrange(0, len(questions))].format()
-            else 
+            else:
                 question = None
 
             return jsonify({
@@ -217,6 +202,14 @@ def create_app(test_config=None):
             "error": 422,
             "message": "unprocessable"
         }), 422
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return jsonify({
+            "success": False,
+            "error": 500,
+            "message": "internal server error"
+        }), 500
 
     '''
     @TODO:
