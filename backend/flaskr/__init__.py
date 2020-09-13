@@ -134,6 +134,21 @@ def create_app(test_config=None):
         except:
             abort(422)
 
+    @app.route("/categories", methods=['GET'])
+    def get_categories():
+        # get all categories
+        categories = Category.query.order_by(Category.type).all()
+        formatted_categories = {category.id: category.type for category in categories}
+        
+        if len(categories) == 0:
+            abort(404)
+
+        return jsonify({
+            'success': True,
+            'categories': formatted_categories,
+            'total_categories': len(categories)
+        })
+
     @app.route("/categories/<category_id>/questions", methods=['GET'])
     def get_questions_by_category(category_id):
         # get questions by category
@@ -156,23 +171,56 @@ def create_app(test_config=None):
             'current_category': category_id
         })
 
-
     '''
     @TODO: 
-    Create a POST endpoint to get questions to play the quiz. 
-    This endpoint should take category and previous question parameters 
-    and return a random questions within the given category, 
-    if provided, and that is not one of the previous questions. 
-
     TEST: In the "Play" tab, after a user selects "All" or a category,
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not. 
     '''
+    @app.route("/quizzes", methods=['POST'])
+    def create_question():
+        # create a new question
+        body = request.get_json()
+        try:
+            previous_questions = body.get('previous_questions')
+            quiz_category = body.get('quiz_category')
+
+            questions = Question.query.filter(
+              Question.category == quiz_category['id'],
+              Question.id.notin_(previous_questions)
+            ).all()
+
+            if len(questions) > 0:
+                question = questions[random.randrange(0, len(questions))].format()
+            else 
+                question = None
+
+            return jsonify({
+                'success': True,
+                'question': question
+            })
+        except:
+            abort(422)
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "not found"
+        }), 404
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            "success": False,
+            "error": 422,
+            "message": "unprocessable"
+        }), 422
 
     '''
-    @TODO: 
-    Create error handlers for all expected errors 
-    including 404 and 422. 
+    @TODO:
+    README update, Unit testing
     '''
   
     return app
