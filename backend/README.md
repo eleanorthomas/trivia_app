@@ -136,6 +136,7 @@ One note before you delve into your tasks: for each endpoint you are expected to
 - Request Arguments: `'question'`, `'answer'`, `'category'`, and `'difficulty'` corresponding to the question string, answer string, category id and difficulty level (1-5) of the new trivia question.
 - Returns: An object with one key, `created`, the value of which contains a question dictionary as described in the `GET /questions` endpoint.
 ```
+{
 	created: {
 		'id': 5,
 		'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?",
@@ -143,6 +144,7 @@ One note before you delve into your tasks: for each endpoint you are expected to
 		'category': 4,
 		'difficulty': 2
 	}	
+}
 ```
 
 ### POST '/questions'
@@ -206,6 +208,7 @@ One note before you delve into your tasks: for each endpoint you are expected to
 - Request Arguments: `previous_questions` and `quiz_category`
 - Returns: An object with one key, `question`, the value of which contains a question dictionary as described in the `GET /questions` endpoint.
 ```
+{
 	question: {
 		'id': 5,
 		'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?",
@@ -213,6 +216,7 @@ One note before you delve into your tasks: for each endpoint you are expected to
 		'category': 4,
 		'difficulty': 2
 	}	
+}
 ```
 
 ## Testing
