@@ -67,19 +67,60 @@ One note before you delve into your tasks: for each endpoint you are expected to
 9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
 
 ## Endpoints
-TODO: Document each endpoint
 
 ### GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
 - Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
+- Returns: An object with two keys, categories and total_categories, the first of which contains a object of id: category_string key:value pairs, and the second of which contains an integer. 
+```
+{
+	categories: {
+		'1' : "Science",
+		'2' : "Art",
+		'3' : "Geography",
+		'4' : "History",
+		'5' : "Entertainment",
+		'6' : "Sports"
+	},
+	total_categories: 6
+}
+```
 
+TODO:
+### GET '/questions'
+- Fetches a paginated set of questions and their corresponding categories.
+- Request Arguments: None
+- Returns: An object with four keys: questions, total_questions, categories, and current_category. 
+
+TODO:
+### DELETE '/questions/<question_id>'
+- Deletes a specific question corresponding to the given question_id parameter.
+- Request Arguments: `question_id`
+- Returns: `question_id`
+
+TODO:
+### POST '/questions/new'
+- Creates a new question and save to the database.
+- Request Arguments: 
+- Returns: 
+
+TODO:
+### GET '/questions'
+- DESC
+- Request Arguments: 
+- Returns: 
+
+TODO:
+### GET '/questions'
+- DESC
+- Request Arguments: 
+- Returns: 
+
+TODO:
+### GET '/questions'
+- DESC
+- Request Arguments: 
+- Returns: 
 ## Testing
 To run the tests, run
 ```
