@@ -69,35 +69,70 @@ def create_app(test_config=None):
             'current_category': None
         })
 
-    '''
-    @TODO: 
-    Create an endpoint to DELETE question using a question ID. 
+    @app.route("/questions/<question_id>", methods=['DELETE'])
+    def delete_question(question_id):
+        # delete the given question
+        try:
+            question = Question.query.get(question_id)
+            question.delete()
 
-    TEST: When you click the trash icon next to a question, the question will be removed.
-    This removal will persist in the database and when you refresh the page. 
-    '''
+            return jsonify({
+                'success': True,
+                'deleted': question_id
+            })
+        except:
+            abort(422)
 
-    '''
-    @TODO: 
-    Create an endpoint to POST a new question, 
-    which will require the question and answer text, 
-    category, and difficulty score.
+    @app.route("/questions/new", methods=['POST'])
+    def create_question():
+        # create a new question
+        body = request.get_json()
+        try:
+            question = body.get('question')
+            answer = body.get('answer')
+            category = body.get('category')
+            difficulty = body.get('difficulty')
 
-    TEST: When you submit a question on the "Add" tab, 
-    the form will clear and the question will appear at the end of the last page
-    of the questions list in the "List" tab.  
-    '''
+            new_question = Question(
+                question=question,
+                answer=answer,
+                category=category,
+                difficulty=difficulty
+            )
+            new_question.insert()
 
-    '''
-    @TODO: 
-    Create a POST endpoint to get questions based on a search term. 
-    It should return any questions for whom the search term 
-    is a substring of the question. 
+            return jsonify({
+                'success': True,
+                'created': question.format()
+            })
+        except:
+            abort(422)
 
-    TEST: Search by any phrase. The questions list will update to include 
-    only question that include that string within their question. 
-    Try using the word "title" to start. 
-    '''
+    @app.route("/questions", methods=['POST'])
+    def search_questions():
+        # search for a question
+        body = request.get_json()
+        try:
+            search_term = body.get('searchTerm')
+
+            results = Question.query.filter(
+              Question.question.ilike(f'%{search_term}%')
+            ).all()
+
+            formatted_questions = [question.format() for question in results]
+
+            categories = Category.query.order_by(Category.type).all()
+            formatted_categories = {category.id: category.type for category in categories}
+
+            return jsonify({
+                'success': True,
+                'questions': formatted_questions,
+                'total_questions': len(results),
+                'categories': formatted_categories,
+                'current_category': None
+            })
+        except:
+            abort(422)
 
     '''
     @TODO: 
