@@ -71,7 +71,7 @@ One note before you delve into your tasks: for each endpoint you are expected to
 ### GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
 - Request Arguments: None
-- Returns: An object with two keys, categories and total_categories, the first of which contains a object of id: category_string key:value pairs, and the second of which contains an integer. 
+- Returns: An object with two keys, `categories` and `total_categories`. The first key, `categories`, contains a object of `id: category_string` key:value pairs. The second key, `total_categories` contains an integer with the total number of categories. 
 ```
 {
 	categories: {
@@ -86,41 +86,135 @@ One note before you delve into your tasks: for each endpoint you are expected to
 }
 ```
 
-TODO:
 ### GET '/questions'
 - Fetches a paginated set of questions and their corresponding categories.
 - Request Arguments: None
-- Returns: An object with four keys: questions, total_questions, categories, and current_category. 
+- Returns: An object with four keys: `questions`, `total_questions`, `categories`, and `current_category`. The first key, `questions`, is a list of dictionary objects, each corresponding to a single question, with keys:value pairs: `'id': question_id`, `'question': question_string`, `'answer': answer_string`, `'category': category_id`, and `'difficulty': difficulty_score`, with difficulty scores ranging from 1-5. The second key, `total_questions`, contains an integer with the total number of questions. The third key, `categories` is as in the `GET '/categories'` endpoint, and the fourth key, `current_category` will be None.
+```
+{
+	questions: [
+		{
+			'id': 2,
+			'question': 'What movie earned Tom Hanks his third straight Oscar nomination, in 1996?',
+			'answer': 'Apollo 13',
+			'category': 5,
+			'difficulty': 4
+		},
+		{
+			'id': 5,
+			'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?",
+			'answer': 'Maya Angelou',
+			'category': 4,
+			'difficulty': 2
+		}
+	],
+	total_questions: 2,
+	categories: {
+		'1' : "Science",
+		'2' : "Art",
+		'3' : "Geography",
+		'4' : "History",
+		'5' : "Entertainment",
+		'6' : "Sports"
+	},
+	current_category: None
+}
+```
 
-TODO:
 ### DELETE '/questions/<question_id>'
 - Deletes a specific question corresponding to the given question_id parameter.
-- Request Arguments: `question_id`
-- Returns: `question_id`
+- Request Arguments: None
+- Returns: An object with one key:value pair, `'deleted': question_id`, with `question_id` corresponding to the deleted question.
+```
+{
+	deleted: 2
+}
+```
 
-TODO:
 ### POST '/questions/new'
 - Creates a new question and save to the database.
-- Request Arguments: 
-- Returns: 
+- Request Arguments: `'question'`, `'answer'`, `'category'`, and `'difficulty'` corresponding to the question string, answer string, category id and difficulty level (1-5) of the new trivia question.
+- Returns: An object with one key, `created`, the value of which contains a question dictionary as described in the `GET /questions` endpoint.
+```
+	created: {
+		'id': 5,
+		'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?",
+		'answer': 'Maya Angelou',
+		'category': 4,
+		'difficulty': 2
+	}	
+```
 
-TODO:
-### GET '/questions'
-- DESC
-- Request Arguments: 
-- Returns: 
+### POST '/questions'
+- Fetches questions which match a user input string.
+- Request Arguments: `searchTerm` containing the user's search query string
+- Returns: Output of the same form as the `GET /questions` endpoint but restricted to questions which contain the user's input string, in a case-insensitive way.
+```
+{
+	questions: [
+		{
+			'id': 2,
+			'question': 'What movie earned Tom Hanks his third straight Oscar nomination, in 1996?',
+			'answer': 'Apollo 13',
+			'category': 5,
+			'difficulty': 4
+		}
+	],
+	total_questions: 1,
+	categories: {
+		'1' : "Science",
+		'2' : "Art",
+		'3' : "Geography",
+		'4' : "History",
+		'5' : "Entertainment",
+		'6' : "Sports"
+	},
+	current_category: None
+}
+```
 
-TODO:
-### GET '/questions'
-- DESC
-- Request Arguments: 
-- Returns: 
+### GET '/categories/<category_id>/questions'
+- Fetches questions from a given category.
+- Request Arguments: None
+- Returns: Output of the same form as the `GET /questions` endpoint but restricted to questions from the given category. Additionally, the fourth key, `current_category`, will contain the id of the given category.
+```
+{
+	questions: [
+		{
+			'id': 2,
+			'question': 'What movie earned Tom Hanks his third straight Oscar nomination, in 1996?',
+			'answer': 'Apollo 13',
+			'category': 5,
+			'difficulty': 4
+		}
+	],
+	total_questions: 1,
+	categories: {
+		'1' : "Science",
+		'2' : "Art",
+		'3' : "Geography",
+		'4' : "History",
+		'5' : "Entertainment",
+		'6' : "Sports"
+	},
+	current_category: 5
+}
+```
 
-TODO:
-### GET '/questions'
-- DESC
-- Request Arguments: 
-- Returns: 
+### POST '/quizzes'
+- Allows the user to play the trivia game for a given category, or all categories, by tracking the category (if applicable) as well as which questions have already been asked, and returns a random question from the given category (if applicable) which has not already been asked.
+- Request Arguments: `previous_questions` and `quiz_category`
+- Returns: An object with one key, `question`, the value of which contains a question dictionary as described in the `GET /questions` endpoint.
+```
+	question: {
+		'id': 5,
+		'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?",
+		'answer': 'Maya Angelou',
+		'category': 4,
+		'difficulty': 2
+	}	
+```
+
 ## Testing
 To run the tests, run
 ```
