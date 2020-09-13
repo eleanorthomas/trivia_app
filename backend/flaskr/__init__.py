@@ -210,11 +210,6 @@ def create_app(test_config=None):
             "error": 500,
             "message": "internal server error"
         }), 500
-
-    '''
-    @TODO:
-    README update, Unit testing
-    '''
   
     return app
 
