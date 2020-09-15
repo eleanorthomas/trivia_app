@@ -139,16 +139,45 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'unprocessable')
 
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
+    def test_search_questions(self):
+        search_json = {'searchTerm': 't'}
+        res = self.client().post('/questions', json=search_json)
+        data = json.loads(res.data)
 
-    POST search questions success
-    POST search questions 422
-    POST play quiz success
-    POST play quiz 422
-    """
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(len(data['question']), 1)
 
+    def test_422_invalid_search_questions(self):
+        search_json = {}
+        res = self.client().post('/questions', json=search_json)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'unprocessable')
+
+    def test_play_quiz(self):
+        quiz_json = {
+            'previous_questions': []
+            'quiz_category': {'id': 0}
+        }
+        res = self.client().post('/quizzes', json=quiz_json)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['questions']) > 0)
+        self.assertTrue(data['total_questions'] > 0)
+
+    def test_422_invalid_play_quiz(self):
+        quiz_json = {}
+        res = self.client().post('/quizzes', json=quiz_json)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'unprocessable')
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
