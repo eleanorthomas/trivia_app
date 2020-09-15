@@ -29,9 +29,124 @@ class TriviaTestCase(unittest.TestCase):
         """Executed after reach test"""
         pass
 
+    def test_get_categories(self):
+        res = self.client().get('/categories')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['categories']) > 0)
+
+    def test_404_invalid_category(self):
+        res = self.client().get('/categories/x')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'not found')
+
+    def test_get_questions(self):
+        res = self.client().get('/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['questions']) > 0)
+
+    def test_404_invalid_question(self):
+        res = self.client().get('/questions/x')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'not found')
+
+    def test_get_questions_by_category(self):
+        res = self.client().get('/categories/1/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['questions']) > 0)
+
+    def test_404_invalid_question_by_category(self):
+        res = self.client().get('/categories/x/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'not found')
+
+    def test_delete_question(self):
+        question = Question(
+            question='test question',
+            answer='answer',
+            category=1,
+            difficulty=1
+        )
+        question.insert()
+        question_id = question.id
+
+        res = self.client().delete(f'/questions/{question_id}')
+        data = json.loads(res.data)
+
+        res_question = Question.query.filter(
+            Question.id == question_id
+        ).one_or_none()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], str(question_id))
+        self.assertEqual(res_question, None)
+
+    def test_422_delete_invalid_question(self):
+        res = self.client().delete('/questions/x')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'unprocessable')
+
+    def test_add_question(self):
+        new_question = {
+            question='test question',
+            answer='answer',
+            category=1,
+            difficulty=1
+        }
+
+        num_questions_before = len(Question.query.all())
+        res = self.client().post('/questions/new', json=new_question)
+        data = json.loads(res.data)
+        num_questions_after = len(Question.query.all())
+
+        # cleanup
+        question_id = data['id']
+        question = Question.query.get(question_id)
+        question.delete()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(num_questions_after, num_questions_before + 1)
+
+    def test_422_add_invalid_question(self):
+        new_question = {}
+
+        res = self.client().post('/questions/new', json=new_question)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'unprocessable')
+
     """
     TODO
     Write at least one test for each test for successful operation and for expected errors.
+
+    POST search questions success
+    POST search questions 422
+    POST play quiz success
+    POST play quiz 422
     """
 
 
