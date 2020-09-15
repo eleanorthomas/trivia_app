@@ -93,6 +93,9 @@ def create_app(test_config=None):
             category = body.get('category')
             difficulty = body.get('difficulty')
 
+            if question is None:
+                abort(422)
+                
             new_question = Question(
                 question=question,
                 answer=answer,
@@ -103,7 +106,7 @@ def create_app(test_config=None):
 
             return jsonify({
                 'success': True,
-                'created': question.format()
+                'created': new_question.format()
             })
         except:
             abort(422)
@@ -114,6 +117,9 @@ def create_app(test_config=None):
         body = request.get_json()
         try:
             search_term = body.get('searchTerm')
+
+            if search_term is None:
+                abort(422)
 
             results = Question.query.filter(
               Question.question.ilike(f'%{search_term}%')

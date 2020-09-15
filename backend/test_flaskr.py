@@ -38,7 +38,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data['categories']) > 0)
 
     def test_404_invalid_category(self):
-        res = self.client().get('/categories/x')
+        res = self.client().get('/categories/99999')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
@@ -54,7 +54,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data['questions']) > 0)
 
     def test_404_invalid_question(self):
-        res = self.client().get('/questions/x')
+        res = self.client().get('/questions?page=99999')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
@@ -70,7 +70,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data['questions']) > 0)
 
     def test_404_invalid_question_by_category(self):
-        res = self.client().get('/categories/x/questions')
+        res = self.client().get('/categories/99999/questions')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
@@ -100,7 +100,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res_question, None)
 
     def test_422_delete_invalid_question(self):
-        res = self.client().delete('/questions/x')
+        res = self.client().delete('/questions/99999')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 422)
@@ -109,10 +109,10 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_add_question(self):
         new_question = {
-            question: 'test question',
-            answer: 'answer',
-            category: 1,
-            difficulty: 1
+            'question': 'test question',
+            'answer': 'answer',
+            'category': 1,
+            'difficulty': 1
         }
 
         num_questions_before = len(Question.query.all())
@@ -121,7 +121,7 @@ class TriviaTestCase(unittest.TestCase):
         num_questions_after = len(Question.query.all())
 
         # cleanup
-        question_id = data['id']
+        question_id = data['created']['id']
         question = Question.query.get(question_id)
         question.delete()
 
@@ -130,9 +130,9 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(num_questions_after, num_questions_before + 1)
 
     def test_422_add_invalid_question(self):
-        new_question = {}
+        new_question_blank = {}
 
-        res = self.client().post('/questions/new', json=new_question)
+        res = self.client().post('/questions/new', json=new_question_blank)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 422)
@@ -146,7 +146,8 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(len(data['question']), 1)
+        self.assertTrue(len(data['questions']) > 0)
+        self.assertTrue(data['total_questions'] > 0)
 
     def test_422_invalid_search_questions(self):
         search_json = {}
@@ -167,8 +168,7 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(len(data['questions']) > 0)
-        self.assertTrue(data['total_questions'] > 0)
+        self.assertTrue(len(data['question']) > 0)
 
     def test_422_invalid_play_quiz(self):
         quiz_json = {}
