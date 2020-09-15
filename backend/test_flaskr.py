@@ -109,10 +109,10 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_add_question(self):
         new_question = {
-            question='test question',
-            answer='answer',
-            category=1,
-            difficulty=1
+            question: 'test question',
+            answer: 'answer',
+            category: 1,
+            difficulty: 1
         }
 
         num_questions_before = len(Question.query.all())
@@ -159,7 +159,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_play_quiz(self):
         quiz_json = {
-            'previous_questions': []
+            'previous_questions': [],
             'quiz_category': {'id': 0}
         }
         res = self.client().post('/quizzes', json=quiz_json)
